@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="mystyle.css">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        font-family: sans-serif;
+        margin: 0 50px;
+    }
+
+    .container {
+        display: flex;
+        gap: 50px;
+    }
+
+    #posts {
+        width: 400px;
+    }
+
+    i {
+        cursor: pointer;
+    }
+
+    #posts div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .options {
+        display: flex;
+        gap: 25px;
+    }
+
+    #msg {
+        color: red;
+    }
+</style>
+
+<body>
+    <h1>Todo App</h1>
+    <div class="container">
+
+        <div class="left">
+
+            <form id="form">
+                <label for="post"> Write your Todos here</label>
+                <br><br>
+                <textarea name="post" id="input" cols="30" rows="10"></textarea>
+                <br> <br>
+                <div id="msg"></div>
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        <div class="right">
+            <div id="posts">
+                <div>
+                    <p>Hello world todo 1</p>
+                    <span class="options">
+                        <i class="fas fa-edit"></i>
+                        <i class="fas fa-trash-alt"></i>
+                    </span>
+                </div>
+
+                <div>
+                    <p>Hello world todo 2</p>
+                    <span class="options">
+                        <i class="fas fa-edit"></i>
+                        <i class="fas fa-trash-alt"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script>
+    let form = document.getElementById("form");
+    let input = document.getElementById("input");
+    let msg = document.getElementById("msg");
+    let posts = document.getElementById("posts");
+    let data = {};
+
+
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        console.log("button clicked");
+
+        formValidation();
+    });
+    let formValidation = () => {
+        let formValidation = () => {
+            console.log("form validation")
+            if (input.value === "") {
+                msg.innerHTML = "todo cannot be blank";
+                console.log("failure");
+            } else {
+                acceptData();
+                console.log("successs");
+                msg.innerHTML = "";
+            }
+        };
+    };
+
+
+    let acceptData = () => {
+        data["text"] = input.value;
+        console.log(data);
+    };
+</script>
+
+</html>

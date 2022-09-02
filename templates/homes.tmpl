@@ -1,0 +1,36 @@
+{{template "base" .}} {{define "content"}}
+
+<h1>Todo App</h1>
+<div class="container">
+  <div class="left">
+    <form id="form">
+      <label for="post"> Write your Todos here</label>
+      <br /><br />
+      <textarea name="post" id="input" cols="30" rows="10"></textarea>
+      <br />
+      <br />
+      <div id="msg"></div>
+      <button type="submit">Add</button>
+    </form>
+  </div>
+  <div class="right">
+    <div id="posts">
+      <div>
+        <p>Hello world todo 1</p>
+        <span class="options">
+          <i class="fas fa-edit"></i>
+          <i class="fas fa-trash-alt"></i>
+        </span>
+      </div>
+
+      <div>
+        <p>Hello world todo 2</p>
+        <span class="options">
+          <i class="fas fa-edit"></i>
+          <i class="fas fa-trash-alt"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}
