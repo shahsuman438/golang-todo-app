@@ -11,7 +11,7 @@ import (
 
 func main() {
 	app := fiber.New(fiber.Config{
-        Views: html.New("./templates", ".html"),
+        Views: html.New("./templates", ".tmpl"),
     })
 	configs.ConnectDB()
 	routes.TodoRoute(app)
