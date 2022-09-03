@@ -1,9 +1,15 @@
 package controllers
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+	"todoapp/utils"
 )
 
-func Home(c *fiber.Ctx) {
-	
+type Todo struct {
+	Title      string
+	IsComplete bool
+}
+
+func Home(w http.ResponseWriter, r *http.Request) {
+	utils.RenderTemplate(w, "Todo-home.tmpl")
 }

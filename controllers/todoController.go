@@ -7,6 +7,7 @@ import (
 	"todoapp/configs"
 	"todoapp/models"
 	"todoapp/responses"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,7 +35,7 @@ func CreateTodo(c *fiber.Ctx) error {
 
 	newTodo := models.Todo{
 		Id:        primitive.NewObjectID(),
-		Done: todo.Done,
+		Completed: todo.Completed,
 		Title:     todo.Title,
 	}
 
@@ -80,7 +81,7 @@ func EditATodo(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(responses.TodoResponse{Status: http.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": validationErr.Error()}})
 	}
 
-	update := bson.M{"title": todo.Title, "IsCompleted": todo.Done}
+	update := bson.M{"title": todo.Title, "completed": todo.Completed}
 
 	result, err := todoCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
 

@@ -14,8 +14,8 @@ func TodoRoute(app *fiber.App) {
 	app.Delete("/todo/:todoId", controllers.DeleteATodo)
 	app.Get("/todos", controllers.GetAllTodos)
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("home", fiber.Map{
-		   "Title": "Hello, World!",
+		return c.Render("Todo-home", fiber.Map{
+			"Title": "Golang Todo App",
 		})
-	  })
+	})
 }
