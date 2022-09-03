@@ -13,91 +13,88 @@
   <link rel="stylesheet" href="../static/style/style.css">
 </head>
 <style>
-  
   .card {
-      border-radius: 0;
-      border: none;
-    }
+    border-radius: 0;
+    border: none;
+  }
 
-    .card-body {
-      padding: 0;
-    }
+  .card-body {
+    margin-top: 5px;
+    padding: 0;
+  }
 
-    .todo-input {
-      border-radius: 0;
-      padding: 10px 10px;
-      border-bottom: none;
-    }
+  .todo-input {
+    border-radius: 0;
+    padding: 10px 10px;
+    border-bottom: none;
+  }
 
-    .todo-input:focus,
-    .todo-input:active {
-      box-shadow: none;
-    }
+  .todo-input:focus,
+  .todo-input:active {
+    box-shadow: none;
+  }
 
-    .action-btn {
-      margin-left: 5px;
-      border-radius: 0;
-      cursor: pointer;
-    }
-    
-    .action-btn:hover{
-      background-color: #146b43;
-    }
+  .action-btn {
+    margin-left: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
 
-    .action-btn:focus,
-    .action-btn:active {
-      box-shadow: none;
-    }
+  .action-btn:hover {
+    background-color: #146b43;
+  }
 
-    .list-group li {
-      margin-top: 5px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+  .action-btn:focus,
+  .action-btn:active {
+    box-shadow: none;
+  }
 
-    .checked {
-      background: #448197;
-      color: #c0d1cf;
-    }
+  .list-group li {
+    cursor: pointer;
+    border-radius: 5px;
+  }
 
-    .show-error {
-      color: red;
-      display: block;
-    }
+  .checked {
+    background: #448197;
+    color: #c0d1cf;
+  }
 
-    .del {
-      text-decoration: line-through;
-    }
+  .show-error {
+    color: red;
+    display: block;
+  }
 
-    .not-checked {
-      background: #67b48d;
-      color: #FFF;
-      font-weight: bold;
-    }
+  .del {
+    text-decoration: line-through;
+  }
 
-    .title {
-      width: 100%;
-      padding: 10px;
-      color: #15063f;
-      background-color: #67b48d;
-      text-align: center;
-      font-size: 20px;
-      font-weight: 700;
-      border-radius: 2px;
-      margin-bottom: 5px;
-    }
+  .not-checked {
+    background: #67b48d;
+    color: #FFF;
+    font-weight: bold;
+  }
 
+  .title {
+    width: 100%;
+    padding: 8px;
+    color: #15063f;
+    background-color: #67b48d;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 2px;
+  }
 </style>
+
 <body>
   <div class="container" id="app">
     <div class="row">
-      <div class="col-12 ">
-        <br><br>
+      <div class="col-12 mt-5 title">
+        {{.Title}}
+      </div>
+      <div class="col-6 left-card">
         <div class="card">
           <div class="card-body">
-            <div class="title">
-              {{.Title}}
-            </div>
             <form v-on:submit.prevent>
               <div class="input-group">
                 <input type="text" v-model="todo.title" v-on:keyup="checkForEnter($event)"
@@ -112,24 +109,30 @@
                 Field cannot be Blank
               </div>
             </form>
-            <ul class="list-group">
-              <li class="list-group-item" :class="{ 'checked': todo.completed, 'not-checked': !todo.completed }"
-                v-for="(todo, todoIndex) in todos" v-on:click="toggleTodo(todo, todoIndex)">
-                <i
-                  :class="{'fa fa-circle': !todo.completed, 'fa fa-check-circle text-success': todo.completed }">&nbsp;</i>
-                <span :class="{ 'del': todo.completed }">@{ todo.title }</span>
-                <div class="btn-group float-right" role="group" aria-label="Basic example">
-                  <button type="button" class="btn btn-success btn-sm action-btn m-1" v-on:click.prevent.stop
-                    v-on:click="editTodo(todo, todoIndex)">Edit</button>
-                  <button type="button" class="btn btn-danger btn-sm action-btn m-1" v-on:click.prevent.stop
-                    v-on:click="deleteTodo(todo, todoIndex)">Delete</button>
-                </div>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
+      <div class="col-6 right-card">
+        <div class="card"></div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item" :class="{ 'checked': todo.completed, 'not-checked': !todo.completed }"
+              v-for="(todo, todoIndex) in todos" v-on:click="toggleTodo(todo, todoIndex)">
+              <i
+                :class="{'fa fa-circle': !todo.completed, 'fa fa-check-circle text-success': todo.completed }">&nbsp;</i>
+              <span :class="{ 'del': todo.completed }">@{ todo.title }</span>
+              <div class="btn-group float-right" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-success btn-sm action-btn m-1" v-on:click.prevent.stop
+                  v-on:click="editTodo(todo, todoIndex)">Edit</button>
+                <button type="button" class="btn btn-danger btn-sm action-btn m-1" v-on:click.prevent.stop
+                  v-on:click="deleteTodo(todo, todoIndex)">Delete</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
     integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
