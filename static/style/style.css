@@ -1,32 +1,69 @@
-body {
-    font-family: sans-serif;
-    margin: 0 50px;
-  }
-  
-  .container {
-    display: flex;
-    gap: 50px;
-  }
-  
-  #posts {
-    width: 400px;
-  }
-  
-  i {
-    cursor: pointer;
-  }
 
-  #posts div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .options {
-    display: flex;
-    gap: 25px;
-  }
-  
-  #msg {
-    color: red;
-  }
+    .card {
+      border-radius: 0;
+      border: none;
+    }
+
+    .card-body {
+      padding: 0;
+    }
+
+    .custom-input {
+      border-radius: 0;
+      padding: 10px 10px;
+      border-bottom: none;
+    }
+
+    .custom-input:focus,
+    .custom-input:active {
+      box-shadow: none;
+    }
+
+    .custom-button {
+      margin-left: 5px;
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .custom-button:focus,
+    .custom-button:active {
+      box-shadow: none;
+    }
+
+    .list-group li {
+      margin-top: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .checked {
+      background: #448197;
+      color: #c0d1cf;
+    }
+
+    .show-error {
+      color: red;
+      display: block;
+    }
+
+    .del {
+      text-decoration: line-through;
+    }
+
+    .not-checked {
+      background: #67b48d;
+      color: #FFF;
+      font-weight: bold;
+    }
+
+    .title {
+      width: 100%;
+      padding: 10px;
+      color: #15063f;
+      background-color: #67b48d;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 2px;
+      margin-bottom: 5px;
+    }
