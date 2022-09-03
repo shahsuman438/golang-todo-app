@@ -103,7 +103,7 @@
             <form v-on:submit.prevent>
               <div class="input-group">
                 <input type="text" v-model="todo.title" v-on:keyup="checkForEnter($event)"
-                  class="form-control todo-input" placeholder="Add your todo">
+                  class="form-control todo-input" placeholder="Write Todo here">
                 <span class="input-group-btn">
                   <button class="btn custom-button" :class="{'btn-success' : !enableEdit, 'btn-warning' : enableEdit}"
                     type="button" v-on:click="addTodo"><span
