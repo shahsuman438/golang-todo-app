@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"todoapp/configs"
@@ -46,7 +45,6 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 func GetATodo(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id := r.URL.Query().Get("id")
-		fmt.Println("id:-", id)
 		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
 		result, err := services.GetATodo(id)
@@ -55,7 +53,6 @@ func GetATodo(w http.ResponseWriter, r *http.Request) {
 		}
 		jsonResp, err := json.Marshal(result)
 		w.Write(jsonResp)
-		fmt.Println("data", result)
 	} else {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -65,7 +62,6 @@ func GetATodo(w http.ResponseWriter, r *http.Request) {
 func EditATodo(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "PUT" {
 		id := r.URL.Query().Get("id")
-		fmt.Println()
 		var todo models.Todo
 		err := json.NewDecoder(r.Body).Decode(&todo)
 		if err != nil {
@@ -80,7 +76,6 @@ func EditATodo(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		jsonResp, err := json.Marshal(result)
 		w.Write(jsonResp)
-		fmt.Println("data", jsonResp)
 	} else {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -89,7 +84,6 @@ func EditATodo(w http.ResponseWriter, r *http.Request) {
 func DeleteATodo(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "DELETE" {
 		id := r.URL.Query().Get("id")
-		fmt.Println("id:-", id)
 		w.Header().Set("Content-Type", "application/json")
 		result, err := services.DeleteATodo(id)
 		if err != nil {

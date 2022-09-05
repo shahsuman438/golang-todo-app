@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Golang Todo App</title>
+  <title>{{.Title}}</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <script type="text/javascript" src="https://unpkg.com/vue@2.3.4"></script>
@@ -90,7 +90,7 @@
   <div class="container" id="app">
     <div class="row">
       <div class="col-12 mt-5 title">
-        Goland Todo App
+        {{.Title}}
       </div>
       <div class="col-6 left-card">
         <div class="card">
@@ -157,7 +157,6 @@
         console.log("mopunted on")
         this.$http.get('getalltodos').then(response => {
           this.todos = response.body;
-          console.log("response data", response)
         });
       },
       methods: {
@@ -179,6 +178,7 @@
                 if (response.status == 201) {
                   this.todos.push({ id: response.body.todo_id, title: this.todo.title, completed: false });
                   this.todo = { id: '', title: '', completed: false };
+                  location.reload();
                 }
               });
             }
