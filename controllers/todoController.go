@@ -1,152 +1,125 @@
 package controllers
 
 import (
-	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
-	"time"
+
 	"todoapp/configs"
 	"todoapp/models"
-	"todoapp/responses"
+	"todoapp/services"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
+
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var todoCollection *mongo.Collection = configs.GetCollection(configs.DB, "todo")
 var validate = validator.New()
 
-func CreateTodo(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	var todo models.Todo
-	defer cancel()
-
-	//validate the request body
-	if err := c.BodyParser(&todo); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(responses.TodoResponse{Status: http.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-	}
-
-	//use the validator library to validate required fields
-	if validationErr := validate.Struct(&todo); validationErr != nil {
-		return c.Status(http.StatusBadRequest).JSON(responses.TodoResponse{Status: http.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": validationErr.Error()}})
-	}
-
-	newTodo := models.Todo{
-		Id:        primitive.NewObjectID(),
-		Completed: todo.Completed,
-		Title:     todo.Title,
-	}
-
-	result, err := todoCollection.InsertOne(ctx, newTodo)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(responses.TodoResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-	}
-
-	return c.Status(http.StatusCreated).JSON(responses.TodoResponse{Status: http.StatusCreated, Message: "success", Data: &fiber.Map{"data": result}})
-}
-
-func GetATodo(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	todoId := c.Params("todoId")
-	var todo models.Todo
-	defer cancel()
-
-	objId, _ := primitive.ObjectIDFromHex(todoId)
-
-	err := todoCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&todo)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(responses.TodoResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-	}
-
-	return c.Status(http.StatusOK).JSON(responses.TodoResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": todo}})
-}
-
-func EditATodo(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	todoId := c.Params("todoId")
-	var todo models.Todo
-	defer cancel()
-
-	objId, _ := primitive.ObjectIDFromHex(todoId)
-
-	//validate the request body
-	if err := c.BodyParser(&todo); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(responses.TodoResponse{Status: http.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-	}
-
-	//use the validator library to validate required fields
-	if validationErr := validate.Struct(&todo); validationErr != nil {
-		return c.Status(http.StatusBadRequest).JSON(responses.TodoResponse{Status: http.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": validationErr.Error()}})
-	}
-
-	update := bson.M{"title": todo.Title, "completed": todo.Completed}
-
-	result, err := todoCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
-
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(responses.TodoResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-	}
-	//get updated Todo details
-	var updatedTodo models.Todo
-	if result.MatchedCount == 1 {
-		err := todoCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&updatedTodo)
-
+func CreateTodo(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		var todo models.Todo
+		//validate the request body
+		err := json.NewDecoder(r.Body).Decode(&todo)
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).JSON(responses.TodoResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-		}
-	}
-
-	return c.Status(http.StatusOK).JSON(responses.TodoResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": updatedTodo}})
-}
-
-func DeleteATodo(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	todoId := c.Params("todoId")
-	defer cancel()
-
-	objId, _ := primitive.ObjectIDFromHex(todoId)
-
-	result, err := todoCollection.DeleteOne(ctx, bson.M{"id": objId})
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(responses.TodoResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-	}
-
-	if result.DeletedCount < 1 {
-		return c.Status(http.StatusNotFound).JSON(
-			responses.TodoResponse{Status: http.StatusNotFound, Message: "error", Data: &fiber.Map{"data": "Todos with specified ID not found!"}},
-		)
-	}
-
-	return c.Status(http.StatusOK).JSON(
-		responses.TodoResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": "Todo successfully deleted!"}},
-	)
-}
-
-func GetAllTodos(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	var todos []models.Todo
-	defer cancel()
-
-	results, err := todoCollection.Find(ctx, bson.M{})
-
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(responses.TodoResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
-	}
-
-	//reading from the db in an optimal way
-	defer results.Close(ctx)
-	for results.Next(ctx) {
-		var singleTodo models.Todo
-		if err = results.Decode(&singleTodo); err != nil {
-			return c.Status(http.StatusInternalServerError).JSON(responses.TodoResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
-		todos = append(todos, singleTodo)
+		//use the validator library to validate required fields
+		if validationErr := validate.Struct(&todo); validationErr != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		w.Header().Set("Content-Type", "application/json")
+		result := services.CreateTodo(&todo)
+		jsonResp, err := json.Marshal(result)
+		w.Write(jsonResp)
+	} else {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
 
-	return c.Status(http.StatusOK).JSON(
-		responses.TodoResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": todos}},
-	)
+}
+
+func GetATodo(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		id := r.URL.Query().Get("id")
+		fmt.Println("id:-", id)
+		w.WriteHeader(http.StatusCreated)
+		w.Header().Set("Content-Type", "application/json")
+		result, err := services.GetATodo(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+		jsonResp, err := json.Marshal(result)
+		w.Write(jsonResp)
+		fmt.Println("data", result)
+	} else {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+
+}
+
+func EditATodo(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "PUT" {
+		id := r.URL.Query().Get("id")
+		fmt.Println()
+		var todo models.Todo
+		err := json.NewDecoder(r.Body).Decode(&todo)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+		update := bson.M{"title": todo.Title, "completed": todo.Completed}
+		result, err := services.EditATodo(id, update)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		jsonResp, err := json.Marshal(result)
+		w.Write(jsonResp)
+		fmt.Println("data", jsonResp)
+	} else {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func DeleteATodo(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "DELETE" {
+		id := r.URL.Query().Get("id")
+		fmt.Println("id:-", id)
+		w.Header().Set("Content-Type", "application/json")
+		result, err := services.DeleteATodo(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+
+		if result.DeletedCount < 1 {
+			http.Error(w, "Todo Not Found", http.StatusNotFound)
+			return
+		}
+		jsonResp, err := json.Marshal(result)
+		w.Write(jsonResp)
+	} else {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func GetAllTodos(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		results, err := services.GetAllTodo()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		jsonResp, err := json.Marshal(results)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.Write(jsonResp)
+	} else {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
 }
