@@ -10,6 +10,13 @@ type Todo struct {
 	IsComplete bool
 }
 
+type heading struct {
+	Title string
+}
+
 func Home(w http.ResponseWriter, r *http.Request) {
-	utils.RenderTemplate(w, "Todo-home.tmpl")
+	p := heading{
+		Title: "Golang Todo App",
+	}
+	utils.RenderTemplate(w, "Todo-home.tpl", p)
 }

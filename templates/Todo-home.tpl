@@ -154,8 +154,9 @@
         todos: []
       },
       mounted() {
-        this.$http.get('todos').then(response => {
-          this.todos = response.body.data.data;
+        console.log("mopunted on")
+        this.$http.get('getalltodos').then(response => {
+          this.todos = response.body;
         });
       },
       methods: {
@@ -165,7 +166,7 @@
           } else {
             this.showError = false;
             if (this.enableEdit) {
-              this.$http.put('todo/' + this.todo.id, this.todo).then(response => {
+              this.$http.put('updatetodo?id=' + this.todo.id, this.todo).then(response => {
                 if (response.status == 200) {
                   this.todos[this.todo.todoIndex] = this.todo;
                 }
@@ -177,6 +178,7 @@
                 if (response.status == 201) {
                   this.todos.push({ id: response.body.todo_id, title: this.todo.title, completed: false });
                   this.todo = { id: '', title: '', completed: false };
+                  location.reload();
                 }
               });
             }
@@ -194,7 +196,7 @@
           } else {
             completedToggle = true;
           }
-          this.$http.put('todo/' + todo.id, { id: todo.id, title: todo.title, completed: completedToggle }).then(response => {
+          this.$http.put('updatetodo?id=' + todo.id, { id: todo.id, title: todo.title, completed: completedToggle }).then(response => {
             if (response.status == 200) {
               this.todos[todoIndex].completed = completedToggle;
               location.reload();
@@ -208,7 +210,7 @@
         },
         deleteTodo(todo, todoIndex) {
           if (confirm("Are you sure ?")) {
-            this.$http.delete('todo/' + todo.id).then(response => {
+            this.$http.delete('deletetodo?id=' + todo.id).then(response => {
               if (response.status == 200) {
                 this.todos.splice(todoIndex, 1);
                 this.todo = { id: '', title: '', completed: false };
