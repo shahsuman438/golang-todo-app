@@ -33,5 +33,6 @@ func main() {
 	http.HandleFunc("/updatetodo", controllers.EditATodo)
 	http.HandleFunc("/deletetodo", controllers.DeleteATodo)
 	http.HandleFunc("/getalltodos", controllers.GetAllTodos)
+	http.HandleFunc("/",controllers.Home)
 	http.ListenAndServe("localhost:8080", nil)
 }

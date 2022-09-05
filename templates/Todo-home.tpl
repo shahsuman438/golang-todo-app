@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>{{.Title}}</title>
+  <title>Golang Todo App</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <script type="text/javascript" src="https://unpkg.com/vue@2.3.4"></script>
@@ -90,7 +90,7 @@
   <div class="container" id="app">
     <div class="row">
       <div class="col-12 mt-5 title">
-        {{.Title}}
+        Goland Todo App
       </div>
       <div class="col-6 left-card">
         <div class="card">
@@ -154,8 +154,10 @@
         todos: []
       },
       mounted() {
-        this.$http.get('todos').then(response => {
-          this.todos = response.body.data.data;
+        console.log("mopunted on")
+        this.$http.get('getalltodos').then(response => {
+          this.todos = response.body;
+          console.log("response data", response)
         });
       },
       methods: {
@@ -165,7 +167,7 @@
           } else {
             this.showError = false;
             if (this.enableEdit) {
-              this.$http.put('todo/' + this.todo.id, this.todo).then(response => {
+              this.$http.put('updatetodo?id=' + this.todo.id, this.todo).then(response => {
                 if (response.status == 200) {
                   this.todos[this.todo.todoIndex] = this.todo;
                 }
@@ -194,7 +196,7 @@
           } else {
             completedToggle = true;
           }
-          this.$http.put('todo/' + todo.id, { id: todo.id, title: todo.title, completed: completedToggle }).then(response => {
+          this.$http.put('updatetodo?id=' + todo.id, { id: todo.id, title: todo.title, completed: completedToggle }).then(response => {
             if (response.status == 200) {
               this.todos[todoIndex].completed = completedToggle;
               location.reload();
@@ -208,7 +210,7 @@
         },
         deleteTodo(todo, todoIndex) {
           if (confirm("Are you sure ?")) {
-            this.$http.delete('todo/' + todo.id).then(response => {
+            this.$http.delete('deletetodo?id=' + todo.id).then(response => {
               if (response.status == 200) {
                 this.todos.splice(todoIndex, 1);
                 this.todo = { id: '', title: '', completed: false };

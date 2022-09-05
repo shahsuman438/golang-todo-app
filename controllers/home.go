@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
-	"todoapp/utils"
+	"text/template"
 )
 
 type Todo struct {
@@ -11,5 +12,9 @@ type Todo struct {
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	utils.RenderTemplate(w, "Todo-home.tmpl")
+	parsedTemplate, _ := template.ParseFiles("./templates/Todo-home.tpl")
+	err := parsedTemplate.Execute(w, nil)
+	if err != nil {
+		fmt.Println("error parsing template", err)
+	}
 }
